@@ -430,5 +430,230 @@ Multiple R-squared:  0.8808,	Adjusted R-squared:  0.8807
 F-statistic:  6651 on 1 and 900 DF,  p-value: < 2.2e-16
 ```
 
-Analisando o Modelo para Predizer Vitórias
+Será que é são necessários 135 Runs a mais para chegar à Playoffs?
 ========================================================
+A partir da regressão linear nós sabemos que $\Large Vitorias = 80.88 + 0.1057 Run_Diffs$ e também sabemos que $\Large Vitorias >= 95$.
+Então...
+$$\Large 80.88 + 0.1057 Run_Diffs >= 95$$
+E...
+$$\Large Run_Diffs >= \frac{95 - 80.8814}{0.1058} >= 133,446$$
+Ou, já que estamos no R...
+
+```r
+RD_min = (95 - 80.8814)/0.1058
+RD_min
+```
+
+```
+[1] 133.4461
+```
+OU seja, sabemos que se um time quer ir para as playoffs ele precisa fazer **133,4** Runs a mais do que seus oponentes. 
+
+O que temos até Agora
+========================================================
+- Para ir para as playoffs o time precisa de 95 vitórias ou mais.
+- Para ter 95 vitórias, o time precisa de 133 ~ 135 Runs a mais do que os oponentes.
+- Para isso, o time precisa:
+-- Fazer mais Runs.
+-- Levar menos Runs.
+
+Como Avaliar um Jogador?
+========================================================
+- Percentual de Rebatidas? (Batting Average - BA)
+- Percentual de tempo que o Jogador passa na Base? (incluindo walks) (On-Base Percentage);
+- Slugging Percentage (SLG). O quão longe um jogador chega na sua vez de rebater;
+- Quais destas estatísticas são mais importantes para considerar quando é necessário **comprar um jogador**?
+
+Recorrendo à Regressão Linear Novamente!
+========================================================
+- Na nossa base de dados estas estatísticas estão indicadas nas variáveis RS (Runs Scored), On-Base Percentage (OBP), Slugging Percentage (SLG) e Batting Average (BA).
+
+```r
+str(moneyball)
+```
+
+```
+'data.frame':	902 obs. of  16 variables:
+ $ Team        : Factor w/ 39 levels "ANA","ARI","ATL",..: 1 2 3 4 5 7 8 9 10 11 ...
+ $ League      : Factor w/ 2 levels "AL","NL": 1 2 2 1 1 2 1 2 1 2 ...
+ $ Year        : int  2001 2001 2001 2001 2001 2001 2001 2001 2001 2001 ...
+ $ RS          : int  691 818 729 687 772 777 798 735 897 923 ...
+ $ RA          : int  730 677 643 829 745 701 795 850 821 906 ...
+ $ W           : int  75 92 88 63 82 88 83 66 91 73 ...
+ $ OBP         : num  0.327 0.341 0.324 0.319 0.334 0.336 0.334 0.324 0.35 0.354 ...
+ $ SLG         : num  0.405 0.442 0.412 0.38 0.439 0.43 0.451 0.419 0.458 0.483 ...
+ $ BA          : num  0.261 0.267 0.26 0.248 0.266 0.261 0.268 0.262 0.278 0.292 ...
+ $ Playoffs    : int  0 1 1 0 0 0 0 0 1 0 ...
+ $ RankSeason  : int  NA 5 7 NA NA NA NA NA 6 NA ...
+ $ RankPlayoffs: int  NA 1 3 NA NA NA NA NA 4 NA ...
+ $ G           : int  162 162 162 162 161 162 162 162 162 162 ...
+ $ OOBP        : num  0.331 0.311 0.314 0.337 0.329 0.321 0.334 0.341 0.341 0.35 ...
+ $ OSLG        : num  0.412 0.404 0.384 0.439 0.393 0.398 0.427 0.455 0.417 0.48 ...
+ $ RD          : int  -39 141 86 -142 27 76 3 -115 76 17 ...
+```
+
+Predizendo o Número de Runs - Modelo Completo
+========================================================
+- Quanto menos Batting Average, mais Runs?!
+
+```r
+modeloruns = lm(formula = RS ~ OBP + SLG + BA, data=moneyball)
+summary(modeloruns)
+```
+
+```
+
+Call:
+lm(formula = RS ~ OBP + SLG + BA, data = moneyball)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-70.941 -17.247  -0.621  16.754  90.998 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -788.46      19.70 -40.029  < 2e-16 ***
+OBP          2917.42     110.47  26.410  < 2e-16 ***
+SLG          1637.93      45.99  35.612  < 2e-16 ***
+BA           -368.97     130.58  -2.826  0.00482 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 24.69 on 898 degrees of freedom
+Multiple R-squared:  0.9302,	Adjusted R-squared:   0.93 
+F-statistic:  3989 on 3 and 898 DF,  p-value: < 2.2e-16
+```
+
+Predizendo o Número de Runs - Sem Batting Average
+========================================================
+- O modelo mais simples tem menos variáveis e ainda tem um R ao quadrado alto.
+$$\Large Runs = -804.3 + 2737.77 * OBP + 1584.91 * SLG$$
+
+```r
+modeloruns_sBA = lm(formula = RS ~ OBP + SLG, data=moneyball)
+summary(modeloruns_sBA)
+```
+
+```
+
+Call:
+lm(formula = RS ~ OBP + SLG, data = moneyball)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-70.838 -17.174  -1.108  16.770  90.036 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -804.63      18.92  -42.53   <2e-16 ***
+OBP          2737.77      90.68   30.19   <2e-16 ***
+SLG          1584.91      42.16   37.60   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 24.79 on 899 degrees of freedom
+Multiple R-squared:  0.9296,	Adjusted R-squared:  0.9294 
+F-statistic:  5934 on 2 and 899 DF,  p-value: < 2.2e-16
+```
+
+Predizendo o Número de Runs Allowed
+========================================================
+Com essa regressão, podemos estimar as Runs Permitidas com a equação:
+$$\Large Runs Permitidas = -837 + 2913.6 * OOBP + 1514.29 * OSLG$$
+
+```r
+modelorunsallowed = lm(formula = RA ~ OOBP + OSLG, data=moneyball)
+summary(modelorunsallowed)
+```
+
+```
+
+Call:
+lm(formula = RA ~ OOBP + OSLG, data = moneyball)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-82.397 -15.178  -0.129  17.679  60.955 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -837.38      60.26 -13.897  < 2e-16 ***
+OOBP         2913.60     291.97   9.979 4.46e-16 ***
+OSLG         1514.29     175.43   8.632 2.55e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 25.67 on 87 degrees of freedom
+  (812 observations deleted due to missingness)
+Multiple R-squared:  0.9073,	Adjusted R-squared:  0.9052 
+F-statistic: 425.8 on 2 and 87 DF,  p-value: < 2.2e-16
+```
+
+Agora que vem a parte legal
+========================================================
+- Com os nossos modelos, agora é possível tentar predizer quantos jogos o Oakland A's vai ganhar em um determinado ano.
+- Estamos tentando predizer quantos jogos o time vai ganhar **antes** da temporada começar, com o objetivo de suportar a decisão sobre **quais jogadores** queremos comprar.
+- Pressuposto # 1: Performance passada dos jogadores do time que estamos montando tem correlação com a performance futura.
+- Pressuposto # 2: A análise assume que haverão poucas lesões.
+- Pressuposto # 3: Podemos estimar estatísticas para 2002 usando estatísticas dos jogadores coletadas em 2001.
+
+Estimando Runs para 2002
+========================================================
+- Com base na temporada de 2001, com o grupo que tivemos sabemos que a média do OBP é 0.339, e do SLG é 0.430.
+- Nossa Regressão para Runs foi $\Large Runs = -804.3 + 2737.77 * OBP + 1584.91 * SLG$.
+- Então a Estimativa de Runs é..
+
+```r
+Runs = -804.3 + 2737.77 * 0.339 + 1584.91 *  0.430
+Runs
+```
+
+```
+[1] 805.3153
+```
+Estimando Runs Allowed para 2002
+========================================================
+- Com base na temporada de 2001, com o grupo que tivemos sabemos que a média do OOBP é 0.307, e do OSLG é 0.373.
+- Nossa Regressão para Runs foi $\Large Runs Permitidas = -837 + 2913.6 * OOBP + 1514.29 * OSLG$.
+- Podemos fazer o mesmo para Runs Allowed
+
+```r
+RunsAllowed = -837 + 2913.6 * 0.307 + 1514.29 * 0.373
+RunsAllowed
+```
+
+```
+[1] 622.3054
+```
+
+Quantos Jogos Esperamos Ganhar com esse Time?
+========================================================
+- Nosso modelo de vitórias diz que $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$. Então.. 
+
+```r
+Vitorias = 80.88 + 0.1057 * (Runs - RunsAllowed)
+if (Vitorias >= 95) {
+  paste("Esse time deve chegar nas Playoffs com ", Vitorias, " vitórias.")
+} else {
+  paste("Compre outros Jogadores, este time não chega nas playoffs com apenas ", Vitorias, " vitórias!")
+}
+```
+
+```
+[1] "Esse time deve chegar nas Playoffs com  100.224152772  vitórias."
+```
+- A abordagem de Paul foi parecida com essa.
+
+A hora da verdade
+========================================================
+- Nosso modelo serve para alguma coisa?
+
+ 
+|Variável|Nosso Modelo | Modelo do Paul | Realizado |
+|--------------|-------------------|-----------------------|---------------|
+|Runs | 805 | 800 - 820 | 800 |
+|Runs Allowed | 622 | 650 - 670 | 653 |
+| Vitórias | 100 | 93 - 97 | 103 |
+- O Oakland A's ganhou 20 jogos em sequência nesse ano, mas não ganhou o campeonato;
+- O Oakland A's conseguiu ir para as Playoffs mais uma vez!
+

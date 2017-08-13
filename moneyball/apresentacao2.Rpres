@@ -199,5 +199,122 @@ $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$
 summary(modelo_vitorias)
 ```
 
-Analisando o Modelo para Predizer Vitórias
+Será que é são necessários 135 Runs a mais para chegar à Playoffs?
 ========================================================
+A partir da regressão linear nós sabemos que $\Large Vitorias = 80.88 + 0.1057 Run_Diffs$ e também sabemos que $\Large Vitorias >= 95$.
+Então...
+$$\Large 80.88 + 0.1057 Run_Diffs >= 95$$
+E...
+$$\Large Run_Diffs >= \frac{95 - 80.8814}{0.1058} >= 133,446$$
+Ou, já que estamos no R...
+```{r}
+RD_min = (95 - 80.8814)/0.1058
+RD_min
+```
+OU seja, sabemos que se um time quer ir para as playoffs ele precisa fazer **133,4** Runs a mais do que seus oponentes. 
+
+O que temos até Agora
+========================================================
+- Para ir para as playoffs o time precisa de 95 vitórias ou mais.
+- Para ter 95 vitórias, o time precisa de 133 ~ 135 Runs a mais do que os oponentes.
+- Para isso, o time precisa:
+-- Fazer mais Runs.
+-- Levar menos Runs.
+
+Como Avaliar um Jogador?
+========================================================
+- Percentual de Rebatidas? (Batting Average - BA)
+- Percentual de tempo que o Jogador passa na Base? (incluindo walks) (On-Base Percentage);
+- Slugging Percentage (SLG). O quão longe um jogador chega na sua vez de rebater;
+- Quais destas estatísticas são mais importantes para considerar quando é necessário **comprar um jogador**?
+
+Recorrendo à Regressão Linear Novamente!
+========================================================
+- Na nossa base de dados estas estatísticas estão indicadas nas variáveis RS (Runs Scored), On-Base Percentage (OBP), Slugging Percentage (SLG) e Batting Average (BA).
+```{r}
+str(moneyball)
+```
+
+Predizendo o Número de Runs - Modelo Completo
+========================================================
+- Quanto menos Batting Average, mais Runs?!
+```{r}
+modeloruns = lm(formula = RS ~ OBP + SLG + BA, data=moneyball)
+summary(modeloruns)
+```
+
+Predizendo o Número de Runs - Sem Batting Average
+========================================================
+- O modelo mais simples tem menos variáveis e ainda tem um R ao quadrado alto.
+$$\Large Runs = -804.3 + 2737.77 * OBP + 1584.91 * SLG$$
+```{r, size = 'Tiny'}
+modeloruns_sBA = lm(formula = RS ~ OBP + SLG, data=moneyball)
+summary(modeloruns_sBA)
+```
+
+Predizendo o Número de Runs Allowed
+========================================================
+Com essa regressão, podemos estimar as Runs Permitidas com a equação:
+$$\Large Runs Permitidas = -837 + 2913.6 * OOBP + 1514.29 * OSLG$$
+```{r, size = 'Tiny'}
+modelorunsallowed = lm(formula = RA ~ OOBP + OSLG, data=moneyball)
+summary(modelorunsallowed)
+```
+
+Agora que vem a parte legal
+========================================================
+- Com os nossos modelos, agora é possível tentar predizer quantos jogos o Oakland A's vai ganhar em um determinado ano.
+- Estamos tentando predizer quantos jogos o time vai ganhar **antes** da temporada começar, com o objetivo de suportar a decisão sobre **quais jogadores** queremos comprar.
+- Pressuposto # 1: Performance passada dos jogadores do time que estamos montando tem correlação com a performance futura.
+- Pressuposto # 2: A análise assume que haverão poucas lesões.
+- Pressuposto # 3: Podemos estimar estatísticas para 2002 usando estatísticas dos jogadores coletadas em 2001.
+
+Estimando Runs para 2002
+========================================================
+- Com base na temporada de 2001, com o grupo que tivemos sabemos que a média do OBP é 0.339, e do SLG é 0.430.
+- Nossa Regressão para Runs foi $\Large Runs = -804.3 + 2737.77 * OBP + 1584.91 * SLG$.
+- Então a Estimativa de Runs é..
+```{r}
+Runs = -804.3 + 2737.77 * 0.339 + 1584.91 *  0.430
+Runs
+```
+Estimando Runs Allowed para 2002
+========================================================
+- Com base na temporada de 2001, com o grupo que tivemos sabemos que a média do OOBP é 0.307, e do OSLG é 0.373.
+- Nossa Regressão para Runs foi $\Large Runs Permitidas = -837 + 2913.6 * OOBP + 1514.29 * OSLG$.
+- Podemos fazer o mesmo para Runs Allowed
+```{r}
+RunsAllowed = -837 + 2913.6 * 0.307 + 1514.29 * 0.373
+RunsAllowed
+```
+
+Quantos Jogos Esperamos Ganhar com esse Time?
+========================================================
+- Nosso modelo de vitórias diz que $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$. Então.. 
+```{r}
+Vitorias = 80.88 + 0.1057 * (Runs - RunsAllowed)
+if (Vitorias >= 95) {
+  paste("Esse time deve chegar nas Playoffs com ", Vitorias, " vitórias.")
+} else {
+  paste("Compre outros Jogadores, este time não chega nas playoffs com apenas ", Vitorias, " vitórias!")
+}
+```
+- A abordagem de Paul foi parecida com essa.
+
+A hora da verdade
+========================================================
+- Nosso modelo serve para alguma coisa?
+
+```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- " 
+|Variável|Nosso Modelo | Modelo do Paul | Realizado |
+|--------------|-------------------|-----------------------|---------------|
+|Runs | 805 | 800 - 820 | 800 |
+|Runs Allowed | 622 | 650 - 670 | 653 |
+| Vitórias | 100 | 93 - 97 | 103 |
+"
+cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+```
+- O Oakland A's ganhou 20 jogos em sequência nesse ano, mas não ganhou o campeonato;
+- O Oakland A's conseguiu ir para as Playoffs mais uma vez!
+

@@ -1,3 +1,9 @@
+---
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
 Introdução a Data Analytics com o R
 ========================================================
 author: Pedro Nascimento de Lima e Dieter Brackman Goldmeyer

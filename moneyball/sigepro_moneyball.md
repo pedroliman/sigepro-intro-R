@@ -118,7 +118,6 @@ Acessando variáveis específicas de um DataFrame
 Podemos acessar variáveis específicas de um Data Frame usando algumas notações possíveis
 Selecionando a coluna Ano
 
-
 ```r
 baseball$Year
 ```

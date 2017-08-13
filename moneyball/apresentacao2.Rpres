@@ -4,6 +4,11 @@ author: Pedro Nascimento de Lima e Dieter Brackman Goldmeyer
 date: 18/08/2017
 autosize: true
 
+Sobre nós
+========================================================
+- GMAP | UNISINOS: Grupo de Pesquisa em Modelagem para Aprendizagem.
+- Alguém que já conhece o R?
+
 O que Veremos neste Mini-Curso?
 ========================================================
 - O que é Data Analytics?
@@ -40,29 +45,159 @@ Que tipo de pessoa usa o R?
 - Analista Quantitativo: Na área financeira, uma analista quantitativo garante que portfolios de investimento estão balenceados e encontra novas oportunidades de trading, e avalia preços de ativos usando modelos matemáticos.
 Fonte: http://datacamp.com
 
-
-
-
-First Slide
+Exemplo - MoneyBall
 ========================================================
+Este exemplo usa dados relacionados ao filme "Moneyball" para apresentar a técnica de regressão linear com o R.
+Este exercício e a ideia de usar o exemplo do Moneyball é baseda em uma aula do MIT, da plataforma Edx: https://courses.edx.org/courses/course-v1:MITx+15.071x_3+1T2016/
 
-For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
-
-- Bullet 1
-- Bullet 2
-- Bullet 3
-
-Slide With Code
+Moneyball e o Oakland A's
 ========================================================
+- Moneyball é o livro que conta a história sobre como o Data Analytics mudou a indústria do baseball;
+- Oakland A's: Um dos times mais pobres do baseball. Foi vendido e teve seu orçamento cortado;
+- Em 2002 o time perdeu três jogadores principais (é desse ponto que o filme começa);
+
+Qual é oO problema dos Times Pequenos?
+========================================================
+- Moneyball é o livro que conta a história sobre como o Data Analytics mudou a indústria do baseball;
+- (Imagem Salários vs Vitórias)
+
+QUal é a meta de um time de Baseball?
+========================================================
+- Ir para as Playoffs!
+- Quantos jogos um time precisa ganhar para chegar às playoffs?
+- Paul DePodesta calculou que um time precisa de 95 vitórias para chegar às Playoffs.
+
+***
+
+![Imagem Playoffs](./imagens/winsvsplayoffs.png)
+
+Como se vence 95 jogos?
+========================================================
+- Fazendo mais "Runs" do que o oponente.
+- Quantos "Runs" a mais?
+- Eles calcularam que precisariam fazer 135 Runs a mais do receberam para ganhar 95 jogos. Como calcular isso?
+
+Lendo Dados em CSV com read.csv()
+========================================================
+Normalmente lemos dados no formato .csv no R para realizar as análises. É possível também ler dados em outros formatos.
+
 
 ```{r}
-summary(cars)
+# Definindo o Working Directory (pasta base na qual estaremos trabalhando).
+setwd("D:/dev/sigepro-intro-R/moneyball")
+# Lendo Dados em CSV
+baseball <- read.csv("baseball.csv")
 ```
 
-Slide With Plot
+
+Conhecendo os Dados com str()
 ========================================================
-
-```{r, echo=FALSE}
-plot(cars)
+Antes de rodar qualquer análise precisamos conhecer a estrutura dos dados.
+Os dados contém uma linha para cada time e ano de 1962 a 2012 para todas as temporadas.
+Dados incluem Runs Scored (RS), Runs Allowed (RA) e Vitórias (W).
+```{r}
+# Podemos fazer isso usando a função str() (que mostra a estrutura)
+str(baseball)
 ```
 
+Resumindo com o summary()
+========================================================
+Também podemos ter uma ideia dos dados usando o summary. Ele nos retorna médias, quartis, valores mínimos e máximos.
+
+```{r}
+summary(baseball)
+```
+
+Acessando variáveis específicas de um DataFrame
+========================================================
+Podemos acessar variáveis específicas de um Data Frame usando algumas notações possíveis.
+
+```{r}
+baseball$Year
+```
+
+Selecionando Linhas Específicas do DF
+========================================================
+Vamos selecionar apenas dados até o ano de 2002 (que foram os dados que eles possuíam em 2002)
+
+```{r}
+# Considerando apenas anos exibidos pelo moneyball
+moneyball = subset(baseball, Year < 2002)
+str(moneyball)
+```
+
+Relembrando nosso objetivo
+========================================================
+- Objetivo: Saber como chegar às playoffs.
+- Em outras Palavras: Saber quantos Runs um time deve fazer a mais do que "leva" para ter mais do que 95 vitórias.
+- Como: Usando uma Regressão Linear para predizer Vitórias em função do Run Differences.
+
+Calculando a RUN Difference
+========================================================
+Criando uma nova variável para calcular a "Run Difference"
+```{r}
+# Calculando a Run Difference
+moneyball$RD = moneyball$RS - moneyball$RA
+str(moneyball)
+```
+
+Existe uma Relação entre Run Difference e Vitórias?
+========================================================
+Só faz sentido usar uma regressão linear se é plausível a existência de uma relação linear entre as variáveis.
+```r
+plot(moneyball$RD, moneyball$W, main = "Vitórias vs Runs Diff.", xlab = "Run. Diff.", ylab = "Vitórias")
+```
+***
+```{r echo=FALSE}
+# Scatterplot to check for linear relationship
+plot(moneyball$RD, moneyball$W, main = "Vitórias vs Runs Diff.", xlab = "Run. Diff.", ylab = "Vitórias")
+```
+
+Um teste de Correlação, só para conferir...
+========================================================
+Existe uma correlação alta entre estas duas variáveis..
+```{r}
+cor(x = moneyball$RD, y = moneyball$W, method=c("pearson", "kendall", "spearman"))
+
+cor.test(x = moneyball$RD, y = moneyball$W, method=c("pearson", "kendall", "spearman"))
+```
+
+
+Visualizando a Correlação entre as duas variáveis
+========================================================
+Existe uma correlação alta entre estas duas variáveis..
+
+***
+
+```{r echo=FALSE,fig.width=7, fig.height=7, fig.show='hold', fig.align='center'}
+
+ggpubr::ggscatter(moneyball, x = "RD", y = "W", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Run Diff.", ylab = "Vitórias")
+
+```
+
+
+
+Ok, como predizer o número de vitórias com base em Run Differences?
+========================================================
+Usando uma Regressão Linear!
+$$\Large y = \beta_0 + \beta_1 * x + e$$
+Ou,  em outras palavras...
+$$\Large Vitorias = \beta_0 + \beta_1 * Run_Diffs + e$$
+Como fazer isso no R?
+```{r}
+modelo_vitorias = lm(W ~ RD, data=moneyball)
+```
+
+Analisando o Modelo para Predizer Vitórias
+========================================================
+- O que isso significa: Podemos predizer o número de vitórias que um time terá a partir de um número de Home Runs.
+$$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$
+```{r}
+summary(modelo_vitorias)
+```
+
+Analisando o Modelo para Predizer Vitórias
+========================================================

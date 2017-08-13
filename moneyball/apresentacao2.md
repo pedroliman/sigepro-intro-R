@@ -1,16 +1,10 @@
----
-output:
-  word_document: default
-  pdf_document: default
-  html_document: default
----
 Introdução a Data Analytics com o R
 ========================================================
 author: Pedro Nascimento de Lima e Dieter Brackman Goldmeyer
 date: 18/08/2017
 autosize: true
 
-Sobre nós
+Sobre nós..
 ========================================================
 - GMAP | UNISINOS: Grupo de Pesquisa em Modelagem para Aprendizagem.
 - Alguém que já conhece o R?

@@ -149,7 +149,7 @@ plot(moneyball$RD, moneyball$W, main = "Vitórias vs Runs Diff.", xlab = "Run. D
 ```
 ***
 ```{r echo=FALSE}
-# Scatterplot to check for linear relationship
+# Scatterplot para ver a relação linear
 plot(moneyball$RD, moneyball$W, main = "Vitórias vs Runs Diff.", xlab = "Run. Diff.", ylab = "Vitórias")
 ```
 

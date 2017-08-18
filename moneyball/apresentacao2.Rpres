@@ -12,7 +12,6 @@ Sobre nós..
 O que Veremos neste Mini-Curso?
 ========================================================
 - O que é Data Analytics?
-- Principais Técnicas
 - Exemplo Moneyball.
 - *Como continuar aprendendo.*
 
@@ -56,12 +55,12 @@ Moneyball e o Oakland A's
 - Oakland A's: Um dos times mais pobres do baseball. Foi vendido e teve seu orçamento cortado;
 - Em 2002 o time perdeu três jogadores principais (é desse ponto que o filme começa);
 
-Qual é oO problema dos Times Pequenos?
+Qual é o problema dos Times Pequenos?
 ========================================================
 - Moneyball é o livro que conta a história sobre como o Data Analytics mudou a indústria do baseball;
 - (Imagem Salários vs Vitórias)
 
-QUal é a meta de um time de Baseball?
+Qual é a meta de um time de Baseball?
 ========================================================
 - Ir para as Playoffs!
 - Quantos jogos um time precisa ganhar para chegar às playoffs?
@@ -318,3 +317,16 @@ cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 - O Oakland A's ganhou 20 jogos em sequência nesse ano, mas não ganhou o campeonato;
 - O Oakland A's conseguiu ir para as Playoffs mais uma vez!
 
+Como Aprender Mais?
+========================================================
+- github.com;
+- datacamp.com;
+- stackoverflow.com;
+- udacity.com;
+- edx.org;
+- coursera.org;
+
+Obrigado!
+========================================================
+- github.com;
+- datacamp.com;

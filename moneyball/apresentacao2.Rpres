@@ -170,8 +170,8 @@ Existe uma correlação alta entre estas duas variáveis..
 
 ```{r echo=FALSE,fig.width=7, fig.height=7, fig.show='hold', fig.align='center'}
 
-ggpubr::ggscatter(moneyball, x = "RD", y = "W", 
-          add = "reg.line", conf.int = TRUE, 
+ggpubr::ggscatter(moneyball, x = "RD", y = "W",
+          add = "reg.line", conf.int = TRUE,
           cor.coef = TRUE, cor.method = "pearson",
           xlab = "Run Diff.", ylab = "Vitórias")
 
@@ -210,7 +210,7 @@ Ou, já que estamos no R...
 RD_min = (95 - 80.8814)/0.1058
 RD_min
 ```
-OU seja, sabemos que se um time quer ir para as playoffs ele precisa fazer **133,4** Runs a mais do que seus oponentes. 
+OU seja, sabemos que se um time quer ir para as playoffs ele precisa fazer **133,4** Runs a mais do que seus oponentes.
 
 O que temos até Agora
 ========================================================
@@ -289,7 +289,7 @@ RunsAllowed
 
 Quantos Jogos Esperamos Ganhar com esse Time?
 ========================================================
-- Nosso modelo de vitórias diz que $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$. Então.. 
+- Nosso modelo de vitórias diz que $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$. Então..
 ```{r}
 Vitorias = 80.88 + 0.1057 * (Runs - RunsAllowed)
 if (Vitorias >= 95) {
@@ -305,7 +305,7 @@ A hora da verdade
 - Nosso modelo serve para alguma coisa?
 
 ```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- " 
+tabl <- "
 |Variável|Nosso Modelo | Modelo do Paul | Realizado |
 |--------------|-------------------|-----------------------|---------------|
 |Runs | 805 | 800 - 820 | 800 |

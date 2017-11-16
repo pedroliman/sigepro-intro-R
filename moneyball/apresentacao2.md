@@ -1,3 +1,8 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
 Introdução a Data Analytics com o R
 ========================================================
 author: Pedro Nascimento de Lima e Dieter Brackman Goldmeyer
@@ -446,7 +451,7 @@ RD_min
 ```
 [1] 133.4461
 ```
-OU seja, sabemos que se um time quer ir para as playoffs ele precisa fazer **133,4** Runs a mais do que seus oponentes. 
+OU seja, sabemos que se um time quer ir para as playoffs ele precisa fazer **133,4** Runs a mais do que seus oponentes.
 
 O que temos até Agora
 ========================================================
@@ -627,7 +632,7 @@ RunsAllowed
 
 Quantos Jogos Esperamos Ganhar com esse Time?
 ========================================================
-- Nosso modelo de vitórias diz que $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$. Então.. 
+- Nosso modelo de vitórias diz que $$\Large Vitorias = 80.88 + 0.1057 Run_Diffs$$. Então..
 
 ```r
 Vitorias = 80.88 + 0.1057 * (Runs - RunsAllowed)
@@ -647,7 +652,7 @@ A hora da verdade
 ========================================================
 - Nosso modelo serve para alguma coisa?
 
- 
+
 |Variável|Nosso Modelo | Modelo do Paul | Realizado |
 |--------------|-------------------|-----------------------|---------------|
 |Runs | 805 | 800 - 820 | 800 |
